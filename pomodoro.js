@@ -1,18 +1,36 @@
-const { setInterval, setTimeout } = require("timers");
 const { exec } = require("child_process");
 
-const cycles = 4; // Number of cycles
-let currentCycle = 0;
+const workDuration = 8;
+const breakDuration = 6;
+const totalCycles = 4; // Number of cycles to complete
 
-function playAlarmSound(alarm) {
-  exec("aplay " + alarm, (error, stdout, stderr) => {
+let completedCycles = 0;
+
+const messages = {
+  workStart: "Work complete! Take a break.",
+  breakStart: "Break time over! Back to work.",
+  allCyclesComplete: "All cycles completed! Timer stopped.",
+};
+
+function playAlertSound(alert) {
+  exec(`aplay ${alert}`, (error, stdout, stderr) => {
     if (error) {
-      console.error(`Error playing alarm sound: ${error}`);
+      console.error(`Error playing alert sound: ${error}`);
     }
   });
 }
 
-function startTimer(timer) {
+function logMessage(message) {
+  console.clear();
+  console.log(message);
+
+  playAlertSound(
+    totalCycles > completedCycles ? "alarm.wav" : "vintage-warning-alarm.wav"
+  );
+}
+
+function startTimer(duration, isWorking) {
+  let timer = duration;
   const countdown = setInterval(() => {
     const minutes = parseInt(timer / 60, 10);
     const seconds = parseInt(timer % 60, 10);
@@ -22,26 +40,26 @@ function startTimer(timer) {
     if (--timer < 0) {
       clearInterval(countdown);
 
-      if (currentCycle < cycles - 1) {
-        console.log("Break!");
-        playAlarmSound("alarm.wav");
-        setTimeout(() => {
-          currentCycle++;
-          startTimer(cycleDuration);
-        }, 1000);
+      if (isWorking) {
+        logMessage(messages.workStart);
+        startTimer(breakDuration, false);
       } else {
-        playAlarmSound("vintage-warning-alarm.wav");
-        console.log("Done!");
+        if (completedCycles < totalCycles) {
+          logMessage(messages.breakStart);
+          completedCycles++;
+          startTimer(workDuration, true);
+        } else {
+          logMessage(messages.allCyclesComplete);
+        }
       }
     }
   }, 1000);
 }
 
-const cycleDuration = 25 * 60;
-const breakDuration = 5 * 60;
-
 console.log(
-  `Cycle duration: ${cycleDuration}\nBreak duration: ${breakDuration}\nStarting program...`
+  `Cycle duration: ${workDuration / 60} minutes\nBreak duration: ${
+    breakDuration / 60
+  } minutes\nStarting program...`
 );
 
-startTimer(cycleDuration);
+startTimer(workDuration, true); // Start with a work period
