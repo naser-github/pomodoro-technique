@@ -1,8 +1,8 @@
 const { exec } = require("child_process");
 
-const workDuration = 8;
-const breakDuration = 6;
-const totalCycles = 4; // Number of cycles to complete
+const workDuration = 25 * 60;
+const breakDuration = 5 * 60;
+const totalCycles = 3; // Number of cycles to complete
 
 let completedCycles = 0;
 
@@ -22,7 +22,7 @@ function playAlertSound(alert) {
 
 function logMessage(message) {
   console.clear();
-  console.log(message);
+  console.log(completedCycles,message);
 
   playAlertSound(
     totalCycles > completedCycles ? "alarm.wav" : "vintage-warning-alarm.wav"
