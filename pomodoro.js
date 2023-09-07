@@ -1,7 +1,7 @@
 const { exec } = require("child_process");
 const notifier = require("node-notifier");
 
-const workDuration = 5;
+const workDuration = 25 * 60;
 const breakDuration = 5 * 60;
 const totalCycles = 3; // Number of cycles to complete
 
