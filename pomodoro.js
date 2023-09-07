@@ -1,6 +1,7 @@
 const { exec } = require("child_process");
+const notifier = require("node-notifier");
 
-const workDuration = 25 * 60;
+const workDuration = 5;
 const breakDuration = 5 * 60;
 const totalCycles = 3; // Number of cycles to complete
 
@@ -20,6 +21,13 @@ function playAlertSound(alert) {
   });
 }
 
+function sendNotification(title, message) {
+  notifier.notify({
+    title: title,
+    message: message,
+  });
+}
+
 function logMessage(message) {
   console.clear();
   console.log(completedCycles,message);
@@ -27,6 +35,8 @@ function logMessage(message) {
   playAlertSound(
     totalCycles > completedCycles ? "alarm.wav" : "vintage-warning-alarm.wav"
   );
+
+  sendNotification("Timer Notification", message);
 }
 
 function startTimer(duration, isWorking) {
