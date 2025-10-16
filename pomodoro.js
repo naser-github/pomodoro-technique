@@ -1,11 +1,12 @@
 const {exec} = require("child_process");
 const notifier = require("node-notifier");
+const path = require("path");
 
 const workDuration = 25 * 60;
 const breakDuration = 5 * 60;
-const totalCycles = 3; // Number of cycles to complete
+const totalPomodoros = 4; // Traditional Pomodoro Technique uses 4 pomodoros
 
-let completedCycles = 0;
+let completedPomodoros = 0;
 
 const messages = {
     workStart: "Work complete! Take a break.",
@@ -14,33 +15,43 @@ const messages = {
 };
 
 function playAlertSound(alert) {
-    exec(`aplay ${alert}`, (error) => {
+    const audioPath = path.join(__dirname, alert);
+    exec(`aplay "${audioPath}"`, (error) => {
         if (error) {
-            console.error(`Error playing alert sound: ${error}`);
+            console.error(`Error playing alert sound: ${error.message}`);
         }
     });
 }
 
 function sendNotification(title, message) {
     notifier.notify({
-        title: title,
-        message: message,
+        title,
+        message,
+        sound: true,
+        wait: false,
     });
+}
+
+function formatTime(minutes, seconds) {
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 function logMessage(message) {
     console.clear();
-    console.log(completedCycles, message);
+    console.log(`\n🍅 Pomodoro Timer - Cycle ${completedPomodoros}/${totalPomodoros}`);
+    console.log(`\n${message}\n`);
 
-    playAlertSound(
-        totalCycles > completedCycles ? "audio_files/alarm.wav" : "audio_files/vintage-warning-alarm.wav"
-    );
+    const alertSound = totalPomodoros > completedPomodoros
+        ? "audio_files/alarm.wav"
+        : "audio_files/vintage-warning-alarm.wav";
 
-    sendNotification("Timer Notification", message);
+    playAlertSound(alertSound);
+    sendNotification("Pomodoro Timer", message);
 }
 
 function startTimer(duration, isWorking) {
     let timer = duration;
+    const timerType = isWorking ? "⏰ WORK SESSION" : "☕ BREAK TIME";
 
     const countdown = setInterval(() => {
         const minutes = Math.floor(timer / 60);
@@ -48,7 +59,10 @@ function startTimer(duration, isWorking) {
 
         // Only log when seconds are at 00 (full minutes) or at start
         if (seconds === 0 || timer === duration) {
-            console.log(`Time Remaining - ${minutes}:${seconds.toString().padStart(2, '0')}\n`);
+            console.clear();
+            console.log(`\n🍅 Pomodoro Timer - Cycle ${completedPomodoros + (isWorking ? 1 : 0)}/${totalPomodoros}`);
+            console.log(`${timerType}`);
+            console.log(`Time Remaining: ${formatTime(minutes, seconds)}\n`);
         }
 
         if (--timer < 0) {
@@ -58,9 +72,9 @@ function startTimer(duration, isWorking) {
                 logMessage(messages.workStart);
                 startTimer(breakDuration, false);
             } else {
-                if (completedCycles < totalCycles) {
+                completedPomodoros++;
+                if (completedPomodoros < totalPomodoros) {
                     logMessage(messages.breakStart);
-                    completedCycles++;
                     startTimer(workDuration, true);
                 } else {
                     logMessage(messages.allCyclesComplete);
@@ -70,10 +84,13 @@ function startTimer(duration, isWorking) {
     }, 1000);
 }
 
-console.log(`
-Cycle duration: ${workDuration / 60} minutes\n
-Break duration: ${breakDuration / 60} minutes\n
-Program has been initiated...
-`);
+console.clear();
+console.log("\n🍅 Pomodoro Timer Starting...\n");
+console.log(`Work Duration: ${workDuration / 60} minutes`);
+console.log(`Break Duration: ${breakDuration / 60} minutes`);
+console.log(`Total Cycles: ${totalPomodoros}`);
+console.log(`\nStarting in 2 seconds...\n`);
 
-startTimer(workDuration, true); // Start with a work period
+setTimeout(() => {
+    startTimer(workDuration, true);
+}, 2000);

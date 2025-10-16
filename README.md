@@ -2,13 +2,9 @@
 
 A command-line Pomodoro timer with desktop notifications and audio alerts. Stay focused with automated 25-minute work sessions and 5-minute breaks.
 
-## What is Pomodoro?
-
-The Pomodoro Technique is a time management method using timed intervals (traditionally 25 minutes) separated by short breaks. Work with focus, avoid distractions, and track your progress.
-
 ## Features
 
-- ⏱️ Automatic work/break cycles (3 cycles by default)
+- ⏱️ Automatic work/break cycles (4 pomodoros by default)
 - 🔔 Desktop notifications
 - 🔊 Audio alerts
 - ⚙️ Customizable durations
@@ -31,17 +27,16 @@ node pomodoro.js
 Edit `pomodoro.js` to customize:
 
 ```javascript
-const workDuration = 25 * 60;  // Work session (seconds)
-const breakDuration = 5 * 60;   // Break duration (seconds)
-const totalCycles = 3;          // Number of cycles
+const workDuration = 25 * 60;     // Work session (seconds)
+const breakDuration = 5 * 60;     // Break duration (seconds)
+const totalPomodoros = 4;         // Number of pomodoros
 ```
 
 ## Audio Files
 
+Audio files are located in the `audio_files/` folder:
 - `alarm.wav` - Regular cycle transitions
 - `vintage-warning-alarm.wav` - All cycles complete
-
-Replace with your own WAV files if desired.
 
 ## Troubleshooting
 
@@ -49,5 +44,8 @@ Replace with your own WAV files if desired.
 
 **No notifications?** Install `libnotify-bin` on Linux.
 
-## 📄 License
+**Script won't run?** Make it executable: `chmod +x run_pomodoro.sh`
 
+---
+
+**Happy focusing! 🍅**
